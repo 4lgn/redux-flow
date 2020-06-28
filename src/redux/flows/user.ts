@@ -116,6 +116,7 @@ export const { reducer } = Flow(
   {
     getInfo: async (state: any) => {
       const res = await fetch(`https://reqres.in/api/users/${state.id}`)
+      if (res.status !== 200) throw Error('Error ' + res.status)
       return await res.json()
     },
   }

@@ -1,4 +1,5 @@
 import { Store, Action as ReduxAction } from 'redux'
+import { CLIENT_RENEG_LIMIT } from 'tls'
 
 // export const { reducer } = Flow(
 //   'user',
@@ -136,8 +137,11 @@ export default function <State>(
     actionToReducer[req] = (state: any, payload?: any) => {
       return {
         ...state,
-        [actionType]: {
-          ...state[actionType],
+        // [actionType]: {
+        //   ...state[actionType],
+        // TODO: VERY TEMPORARY (NEEDS RE-DO IN MAKING SURE TO GET LINK BETWEEN ACTION NAME AND STATE NAME)
+        info: {
+          ...state.info,
           isFetching: true,
         },
       }
@@ -165,9 +169,10 @@ export default function <State>(
   })
 
   const reducer = (state: any = initialState, action: any): State => {
+    if (!actionToReducer[action.type]) return state
     // TODO: Handle async (on request, run async and dispatch success/error)
     // const regex = /^(.*)\_(REQUEST|SUCCESS|FAILED)$/gm
-    const regex = /^\w*\/(\w*)\_(REQUEST|SUCCESS|FAILED)$/gm
+    const regex = /^\w*\/(\w*)_(REQUEST|SUCCESS|FAILED)$/gm
     const str = action.type
     let matches: string[] = []
     let m
@@ -187,18 +192,30 @@ export default function <State>(
 
       // when async is done and successful, dispatch success with data as payload
       // if failed, dispatch failed with error as payload (maybe check if error is empty or null, and generically type 'Error!' as payload)
-      const dispatch = (type: string, payload: any) =>
-        store.dispatch({ type: `${name}/${matches[1]}_${type}`, payload })
+
+      // const dispatch = (type: string, payload: any) =>
+      //   store.dispatch({ type: `${name}/${matches[1]}_${type}`, payload })
 
       promise
-        .then(res => dispatch('SUCCESS', res))
-        .catch(err => dispatch('FAILED', err))
+        .then(res => {
+          const action = { type: `${name}/${matches[1]}_SUCCESS`, payload: res }
+          console.log('??? ' + store === undefined)
+          console.log(action)
+          store.dispatch(action)
+          // dispatch('SUCCESS', res)
+        })
+        .catch(err => {
+          console.log('oh no')
+          console.log(err)
+        })
+      // .catch(err => dispatch('FAILED', err))
     }
 
     // TODO: Can maybe do this more concise
     if (action.payload) {
       return actionToReducer[action.type](state, action.payload)
     } else {
+      console.log(action.type)
       return actionToReducer[action.type](state)
     }
   }

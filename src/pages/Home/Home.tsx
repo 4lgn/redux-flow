@@ -7,21 +7,28 @@ import { useDispatch, useSelector } from 'react-redux'
 
 const Home: React.FC = () => {
   const dispatch = useDispatch()
-  // const repos = useSelector(repositories)
 
   return (
     <div>
-      {/* <button onClick={() => dispatch(fetchRepositories('#bspwm'))}>
-        Hey, click me!
-      </button> */}
-
-      <div>
-        {/* <StandardSelectorDisplay
-          selector={repos}
-          // TODO: Make it possible to get type annotations on the data parameter being the same as the data object in repos
-          successRender={data => <RepoList data={data} />}
-        /> */}
-      </div>
+      <button
+        onClick={() => {
+          dispatch({
+            type: 'user/setId',
+            payload: 5,
+          })
+        }}
+      >
+        Press me!
+      </button>
+      <button
+        onClick={() => {
+          dispatch({
+            type: 'user/getInfo_REQUEST',
+          })
+        }}
+      >
+        No, me! :)
+      </button>
     </div>
   )
 }
