@@ -1,5 +1,4 @@
 import { combineReducers } from 'redux'
+import * as user from './flows/user'
 
-const user = null
-
-export default combineReducers({ user })
+export default combineReducers({ user: user.reducer })
