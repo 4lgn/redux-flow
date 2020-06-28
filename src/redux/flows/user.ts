@@ -1,4 +1,5 @@
 import Flow from '../Flow'
+import store from '../store'
 
 /*
 
@@ -101,6 +102,7 @@ const asyncState = {
 // TODO: Suggestion: maybe make it key'ed object like Vuex
 
 export const { reducer } = Flow(
+  store,
   'user',
   {
     id: 0,

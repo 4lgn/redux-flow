@@ -1,10 +1,10 @@
-import { createStore } from 'redux'
+import { createStore, Store, Action } from 'redux'
 import rootReducer from './rootReducer'
 import { composeWithDevTools } from 'redux-devtools-extension'
 
-const store = createStore(
+const store: Store<{}, Action<any>> = createStore(
   rootReducer,
-  composeWithDevTools(),
+  composeWithDevTools()
 )
 
 export default store
