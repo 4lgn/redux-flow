@@ -89,8 +89,47 @@ import { CLIENT_RENEG_LIMIT } from 'tls'
 //   return object instanceof ((state: any, payload: any) => void)
 // }
 
+export const flowMiddleware = (store: any) => (next: any) => (action: any) => {
+  if (!action.meta) return next(action)
+
+  console.log('from middleware')
+  console.log(action)
+  // TODO: Handle async (on request, run async and dispatch success/error)
+  const regex = /^\w*\/(\w*)_(REQUEST|SUCCESS|FAILED)$/gm
+  const str = action.type
+  let matches: string[] = []
+  let m
+  while ((m = regex.exec(str)) !== null) {
+    if (m.index === regex.lastIndex) regex.lastIndex++
+    m.forEach((match, groupIndex) => (matches[groupIndex] = match))
+  }
+
+  if (matches.length > 0 && matches[2] === 'REQUEST') {
+    console.log('right?')
+    // find async to run
+    const asyncFunc = action.meta
+
+    // run with state (is in reducer params, and optionally action payload (if exists))
+    let promise = action.payload
+      ? asyncFunc(store.getState(), action.payload)
+      : asyncFunc(store.getState().user)
+
+    // when async is done and successful, dispatch success with data as payload
+    // if failed, dispatch failed with error as payload (maybe check if error is empty or null, and generically type 'Error!' as payload)
+
+    const dispatch = (type: string, payload: any) =>
+      // store.dispatch({ type: `user/${matches[1]}_${type}`, payload })
+      store.dispatch({ type: matches[0].replace(matches[2], type), payload })
+    promise
+      .then((res: any) => dispatch('SUCCESS', res))
+      .catch((err: any) => dispatch('FAILED', err))
+  }
+
+  return next(action)
+}
+
 export default function <State>(
-  store: Store<{}, ReduxAction<any>>,
+  // store: Store<{}, ReduxAction<any>>,
   name: string,
   initialState: State,
   mutations: {
@@ -113,10 +152,17 @@ export default function <State>(
     [key: string]: (state: any, payload?: any) => State
   } = {}
 
-  const insertAction = (actionType: string) => {
+  const insertAction = (
+    actionType: string,
+    meta?: (state: State, payload?: any) => Promise<any>
+  ) => {
     actionCreators.push((payload?: any) => {
       const action = { type: actionType }
-      return payload ? { ...action, payload } : action
+      if (!meta) {
+        return payload ? { ...action, payload } : action
+      } else {
+        return payload ? { ...action, payload, meta } : { ...action, meta }
+      }
     })
   }
 
@@ -128,18 +174,18 @@ export default function <State>(
 
   Object.entries(actions).forEach(([key, value]) => {
     const actionType = suffix(key)
-    insertAction(actionType)
 
     const req = `${actionType}_REQUEST`
+    insertAction(req, value)
     const success = `${actionType}_SUCCESS`
     const fail = `${actionType}_FAILED`
 
     actionToReducer[req] = (state: any, payload?: any) => {
       return {
         ...state,
+        // TODO: VERY TEMPORARY (NEEDS RE-DO IN MAKING SURE TO GET LINK BETWEEN ACTION NAME AND STATE NAME)
         // [actionType]: {
         //   ...state[actionType],
-        // TODO: VERY TEMPORARY (NEEDS RE-DO IN MAKING SURE TO GET LINK BETWEEN ACTION NAME AND STATE NAME)
         info: {
           ...state.info,
           isFetching: true,
@@ -149,7 +195,9 @@ export default function <State>(
     actionToReducer[success] = (state: any, payload: any) => {
       return {
         ...state,
-        [actionType]: {
+        // TODO: ALSO THIS
+        // [actionType]: {
+        info: {
           isFetching: false,
           error: '',
           data: payload,
@@ -159,8 +207,11 @@ export default function <State>(
     actionToReducer[fail] = (state: any, payload: any) => {
       return {
         ...state,
-        [actionType]: {
-          ...state[actionType],
+        // TODO: AND THIS
+        // [actionType]: {
+        //   ...state[actionType],
+        info: {
+          ...state.info,
           isFetching: false,
           error: payload,
         },
@@ -169,9 +220,10 @@ export default function <State>(
   })
 
   const reducer = (state: any = initialState, action: any): State => {
+    // Only reduce on our action types
     if (!actionToReducer[action.type]) return state
+
     // TODO: Handle async (on request, run async and dispatch success/error)
-    // const regex = /^(.*)\_(REQUEST|SUCCESS|FAILED)$/gm
     const regex = /^\w*\/(\w*)_(REQUEST|SUCCESS|FAILED)$/gm
     const str = action.type
     let matches: string[] = []
@@ -181,41 +233,11 @@ export default function <State>(
       m.forEach((match, groupIndex) => (matches[groupIndex] = match))
     }
 
-    if (matches.length > 0 && matches[2] === 'REQUEST') {
-      // find async to run
-      const asyncFunc = actions[matches[1]]
-
-      // run with state (is in reducer params, and optionally action payload (if exists))
-      let promise = action.payload
-        ? asyncFunc(state, action.payload)
-        : asyncFunc(state)
-
-      // when async is done and successful, dispatch success with data as payload
-      // if failed, dispatch failed with error as payload (maybe check if error is empty or null, and generically type 'Error!' as payload)
-
-      // const dispatch = (type: string, payload: any) =>
-      //   store.dispatch({ type: `${name}/${matches[1]}_${type}`, payload })
-
-      promise
-        .then(res => {
-          const action = { type: `${name}/${matches[1]}_SUCCESS`, payload: res }
-          console.log('??? ' + store === undefined)
-          console.log(action)
-          store.dispatch(action)
-          // dispatch('SUCCESS', res)
-        })
-        .catch(err => {
-          console.log('oh no')
-          console.log(err)
-        })
-      // .catch(err => dispatch('FAILED', err))
-    }
-
     // TODO: Can maybe do this more concise
     if (action.payload) {
       return actionToReducer[action.type](state, action.payload)
     } else {
-      console.log(action.type)
+      // console.log(action.type)
       return actionToReducer[action.type](state)
     }
   }

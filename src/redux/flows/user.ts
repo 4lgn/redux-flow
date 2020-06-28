@@ -101,8 +101,8 @@ const asyncState = {
 
 // TODO: Suggestion: maybe make it key'ed object like Vuex
 
-export const { reducer } = Flow(
-  store,
+export const { reducer, actions } = Flow(
+  // store,
   'user',
   {
     id: 0,

@@ -1,10 +1,11 @@
-import { createStore, Store, Action } from 'redux'
+import { createStore, Store, Action, applyMiddleware } from 'redux'
 import rootReducer from './rootReducer'
 import { composeWithDevTools } from 'redux-devtools-extension'
+import { flowMiddleware } from './Flow'
 
 const store: Store<{}, Action<any>> = createStore(
   rootReducer,
-  composeWithDevTools()
+  composeWithDevTools(applyMiddleware(flowMiddleware))
 )
 
 export default store
