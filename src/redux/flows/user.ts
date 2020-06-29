@@ -1,5 +1,4 @@
 import Flow from '../Flow'
-import store from '../store'
 
 /*
 
@@ -29,95 +28,29 @@ const asyncState = {
   error: '',
 }
 
-// const lol = Flow({
-//   name: 'user',
-//   initialState: {
-//     authToken: '',
-//     info: asyncState
-//   },
-//   actions: {
-//     setAuthToken(state: any, payload: any) {
-//       state.authToken = payload
-//     }
-//   },
-//   asyncActions: {
-//     async userInfo(state: any) {
-//       const res = await fetch('https://reqres.in/api/users/2')
-//       return await res.json()
-//     }
-//   }
-// })
-
-// const Flow2 = (name: string, initialState: {}, actions: {}, asyncActions?: {}) => ({})
-
-// const lol2 = Flow2(
-//   'user',
-//   {
-//     id: 0,
-//     info: asyncState
-//   },
-//   {
-//     setId: (state: any, payload: any) => {
-//       state.id = payload
-//     }
-//   },
-//   {
-//     info: {
-//       userInfo: async (state: any) => {
-//         const res = await fetch(`https://reqres.in/api/users/${state.id}`)
-//         return await res.json()
-//       },
-//     },
-//   }
-// )
-
-// export const { reducer } = Flow(
-//   'user',
-//   {
-//     id: {
-//       init: 0,
-//       mutations: {
-//         setUserId: (current, payload) => {
-//           return ''
-//         },
-//       },
-//     },
-//     info: {
-//       init: asyncState,
-//       fetcher: async (state: any) => {
-//         const res = await fetch(`https://reqres.in/api/users/${state.id}`)
-//         return await res.json()
-//       },
-//     },
-//   },
-//   {
-//     setUserIdAndDoSomething: (state: any, payload: any) => {
-//       return state
-//     },
-//   }
-// )
-
-// New proposal, have mutations (synchronous) and actions (asynchronous)
-
 // TODO: Suggestion: maybe make it key'ed object like Vuex
 
-export const { reducer, actions } = Flow(
-  // store,
-  'user',
-  {
+export const { reducer, actions } = Flow('user', {
+  initialState: {
     id: 0,
     info: asyncState,
   },
-  {
-    setId: (state: any, payload: any) => {
+  mutations: {
+    setId(state: any, payload: any) {
       return { ...state, id: payload }
     },
+    // incrementId(state: any) {
+    //   return { ...state, id: state.id + 1 }
+    // },
   },
-  {
-    getInfo: async (state: any) => {
+  actions: {
+    async info(state: any) {
       const res = await fetch(`https://reqres.in/api/users/${state.id}`)
+      // const res = await fetch(
+      //   `http://slowwly.robertomurray.co.uk/delay/3000/url/https://reqres.in/api/users/${state.id}`
+      // )
       if (res.status !== 200) throw Error('Error ' + res.status)
       return await res.json()
     },
-  }
-)
+  },
+})
