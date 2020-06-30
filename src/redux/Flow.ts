@@ -26,19 +26,16 @@ type Action<State> = {
 
 type ActionCreator = <T>(payload?: T) => Action<T>
 
-export const flowMiddleware = (store: any) => (next: any) => (action: any) => {
+export const flowMiddleware = (store: any) => (next: any) => (
+  action: Action<any>
+) => {
   if (!action.meta) return next(action)
 
-  const regex = /^\w*\/(\w*)_(REQUEST|SUCCESS|FAILED)$/gm
-  const str = action.type
-  let matches: string[] = []
-  let m
-  while ((m = regex.exec(str)) !== null) {
-    if (m.index === regex.lastIndex) regex.lastIndex++
-    m.forEach((match, groupIndex) => (matches[groupIndex] = match))
-  }
+  const matches = /^\w*\/(\w*)_(REQUEST|SUCCESS|FAILED)$/gm.exec(action.type)
+  if (!matches) return next(action)
+  const [suffixedActionName, actionName, modifier] = matches
 
-  if (matches.length > 0 && matches[2] === 'REQUEST') {
+  if (modifier === 'REQUEST') {
     const asyncFunc = action.meta
 
     let promise = action.payload
@@ -46,7 +43,10 @@ export const flowMiddleware = (store: any) => (next: any) => (action: any) => {
       : asyncFunc(store.getState().user)
 
     const dispatch = (type: string, payload: any) =>
-      store.dispatch({ type: matches[0].replace(matches[2], type), payload })
+      store.dispatch({
+        type: suffixedActionName.replace(modifier, type),
+        payload,
+      })
 
     promise
       .then((res: any) => dispatch('SUCCESS', res))
@@ -153,17 +153,6 @@ export default function <State>(
   ): State => {
     // Only reduce on our action types
     if (!actionToReducer[action.type]) return state
-
-    // TODO: Can maybe do this more concise
-    const regex = /^\w*\/(\w*)_(REQUEST|SUCCESS|FAILED)$/gm
-    const str = action.type
-    let matches: string[] = []
-    let m
-    while ((m = regex.exec(str)) !== null) {
-      if (m.index === regex.lastIndex) regex.lastIndex++
-      m.forEach((match, groupIndex) => (matches[groupIndex] = match))
-    }
-
     return actionToReducer[action.type](state, action.payload)
   }
 
