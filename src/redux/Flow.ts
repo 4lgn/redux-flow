@@ -18,6 +18,14 @@ export const asyncState: AsyncObj<any> = {
   error: '',
 }
 
+type Action<State> = {
+  type: string
+  payload: any
+  meta?: (state: State, payload?: any) => Promise<any>
+}
+
+type ActionCreator = <T>(payload?: T) => Action<T>
+
 export const flowMiddleware = (store: any) => (next: any) => (action: any) => {
   if (!action.meta) return next(action)
 
@@ -61,18 +69,12 @@ export default function <State>(
     }
     actions: {
       [actionName: string]: {
-        selector: string
+        selector: keyof State
         fn: (state: State, payload?: any) => Promise<any>
       }
     }
   }
 ) {
-  type Action<T> = {
-    type: string
-    payload?: T
-  }
-  type ActionCreator = <T>(payload?: T) => Action<T>
-
   const suffix = (key: string) => `${name}/${key}`
 
   const actionCreators: ActionCreator[] = []
@@ -100,7 +102,7 @@ export default function <State>(
   Object.entries(mutations).forEach(([mutationName, mutation]) => {
     const actionType = suffix(mutationName)
     insertAction(actionType, mutationName)
-    actionToReducer[actionType] = (state: any, payload?: any) => {
+    actionToReducer[actionType] = (state: State, payload?: any) => {
       mutation(state, payload)
       return state
     }
@@ -114,7 +116,7 @@ export default function <State>(
     const success = `${actionType}_SUCCESS`
     const fail = `${actionType}_FAILED`
 
-    actionToReducer[req] = (state: any) => {
+    actionToReducer[req] = (state: State) => {
       return {
         ...state,
         [selector]: {
@@ -123,7 +125,7 @@ export default function <State>(
         },
       }
     }
-    actionToReducer[success] = (state: any, payload: any) => {
+    actionToReducer[success] = (state: State, payload: any) => {
       return {
         ...state,
         [selector]: {
@@ -133,7 +135,7 @@ export default function <State>(
         },
       }
     }
-    actionToReducer[fail] = (state: any, payload: any) => {
+    actionToReducer[fail] = (state: State, payload: string) => {
       return {
         ...state,
         [selector]: {
@@ -145,7 +147,10 @@ export default function <State>(
     }
   })
 
-  const reducer = (state: State = initialState, action: any): State => {
+  const reducer = (
+    state: State = initialState,
+    action: Action<State>
+  ): State => {
     // Only reduce on our action types
     if (!actionToReducer[action.type]) return state
 

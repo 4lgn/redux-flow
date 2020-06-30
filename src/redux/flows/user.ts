@@ -20,8 +20,8 @@ const { reducer, actions } = Flow('user', {
     info: asyncState,
   } as State,
   mutations: {
-    setId(state: State, payload: number) {
-      state.id = payload
+    setId(state: State, id: number) {
+      state.id = id
     },
   },
   actions: {
@@ -40,7 +40,7 @@ export const {
   setId,
   fetchUserInfo,
 }: {
-  setId: (payload: number) => Action
+  setId: (id: number) => Action
   fetchUserInfo: () => Action
 } = actions as any
 
