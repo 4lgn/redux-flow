@@ -57,11 +57,12 @@ export default function <State>(
   }: {
     initialState: State
     mutations: {
-      [key: string]: (state: State, payload?: any) => State
+      [mutationName: string]: (state: State, payload?: any) => void
     }
     actions: {
       [actionName: string]: {
-        selector: (state: State) => AsyncObj<any>
+        // selector: (state: State) => AsyncObj<any>
+        selector: string
         fn: (state: State, payload?: any) => Promise<any>
       }
     }
@@ -82,10 +83,11 @@ export default function <State>(
 
   const insertAction = (
     actionType: string,
+    name: string,
     meta?: (state: State, payload?: any) => Promise<any>
   ) => {
     actionCreators.push(
-      nameFunction('asd', (payload?: any) => {
+      nameFunction(name, (payload?: any) => {
         const action = { type: actionType }
         if (!meta) {
           return payload ? { ...action, payload } : action
@@ -96,25 +98,28 @@ export default function <State>(
     )
   }
 
-  Object.entries(mutations).forEach(([key, value]) => {
-    const actionType = suffix(key)
-    insertAction(actionType)
-    actionToReducer[actionType] = value
+  Object.entries(mutations).forEach(([mutationName, mutation]) => {
+    const actionType = suffix(mutationName)
+    insertAction(actionType, mutationName)
+    actionToReducer[actionType] = (state: any, payload?: any) => {
+      mutation(state, payload)
+      return state
+    }
   })
 
-  Object.entries(actions).forEach(([key, value]) => {
-    const actionType = suffix(key)
+  Object.entries(actions).forEach(([actionName, { selector, fn }]) => {
+    const actionType = suffix(actionName)
 
     const req = `${actionType}_REQUEST`
-    insertAction(req, value)
+    insertAction(req, actionName, fn)
     const success = `${actionType}_SUCCESS`
     const fail = `${actionType}_FAILED`
 
-    actionToReducer[req] = (state: any, payload?: any) => {
+    actionToReducer[req] = (state: any) => {
       return {
         ...state,
-        [key]: {
-          ...state[key],
+        [selector]: {
+          ...state[selector],
           isFetching: true,
         },
       }
@@ -122,7 +127,7 @@ export default function <State>(
     actionToReducer[success] = (state: any, payload: any) => {
       return {
         ...state,
-        [key]: {
+        [selector]: {
           isFetching: false,
           error: '',
           data: payload,
@@ -132,8 +137,8 @@ export default function <State>(
     actionToReducer[fail] = (state: any, payload: any) => {
       return {
         ...state,
-        [key]: {
-          ...state[key],
+        [selector]: {
+          ...state[selector],
           isFetching: false,
           error: payload,
         },
@@ -155,12 +160,7 @@ export default function <State>(
       m.forEach((match, groupIndex) => (matches[groupIndex] = match))
     }
 
-    // TODO: Can maybe do this more concise
-    if (action.payload) {
-      return actionToReducer[action.type](state, action.payload)
-    } else {
-      return actionToReducer[action.type](state)
-    }
+    return actionToReducer[action.type](state, action.payload)
   }
 
   console.log(actionCreators)

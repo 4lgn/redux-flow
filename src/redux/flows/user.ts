@@ -26,6 +26,10 @@ selectors?
 
 interface UserInfo {
   id: number
+  email: string
+  first_name: string
+  last_name: string
+  avatar: string
 }
 
 type State = {
@@ -40,19 +44,20 @@ export const { reducer, actions } = Flow('user', {
   } as State,
   mutations: {
     setId(state: State, payload: number) {
-      return { ...state, id: payload }
+      state.id = payload
     },
   },
   actions: {
     fetchUserInfo: {
-      selector: (state: State) => state.info,
+      // selector: (state: State) => state.info,
+      selector: 'info',
       fn: async (state: State) => {
         const res = await fetch(`https://reqres.in/api/users/${state.id}`)
         // const res = await fetch(
         //   `http://slowwly.robertomurray.co.uk/delay/3000/url/https://reqres.in/api/users/${state.id}`
         // )
         if (res.status !== 200) throw Error('Error ' + res.status)
-        return await res.json()
+        return (await res.json()).data
       },
     },
   },
