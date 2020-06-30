@@ -61,7 +61,6 @@ export default function <State>(
     }
     actions: {
       [actionName: string]: {
-        // selector: (state: State) => AsyncObj<any>
         selector: string
         fn: (state: State, payload?: any) => Promise<any>
       }
@@ -163,10 +162,16 @@ export default function <State>(
     return actionToReducer[action.type](state, action.payload)
   }
 
-  console.log(actionCreators)
+  const actionObj: {
+    [key: string]: ActionCreator
+  } = {}
+
+  actionCreators.forEach(fn => {
+    actionObj[fn.name] = fn
+  })
 
   return {
     reducer,
-    actions: actionCreators,
+    actions: actionObj,
   }
 }
