@@ -1,3 +1,23 @@
+function nameFunction(name: string, body: any) {
+  return {
+    [name](...args: any[]) {
+      return body(...args)
+    },
+  }[name]
+}
+
+export interface AsyncObj<T> {
+  isFetching: boolean
+  data: T
+  error: string
+}
+
+export const asyncState: AsyncObj<any> = {
+  isFetching: false,
+  data: null,
+  error: '',
+}
+
 export const flowMiddleware = (store: any) => (next: any) => (action: any) => {
   if (!action.meta) return next(action)
 
@@ -28,10 +48,6 @@ export const flowMiddleware = (store: any) => (next: any) => (action: any) => {
   return next(action)
 }
 
-function nameFunction(name: string, body: any) {
-  return {[name](...args: any[]) {return body(...args)}}[name]
-}
-
 export default function <State>(
   name: string,
   {
@@ -44,7 +60,10 @@ export default function <State>(
       [key: string]: (state: State, payload?: any) => State
     }
     actions: {
-      [key: string]: (state: State, payload?: any) => Promise<any>
+      [actionName: string]: {
+        selector: (state: State) => AsyncObj<any>
+        fn: (state: State, payload?: any) => Promise<any>
+      }
     }
   }
 ) {
@@ -65,14 +84,16 @@ export default function <State>(
     actionType: string,
     meta?: (state: State, payload?: any) => Promise<any>
   ) => {
-    actionCreators.push(nameFunction((payload?: any) {
-      const action = { type: actionType }
-      if (!meta) {
-        return payload ? { ...action, payload } : action
-      } else {
-        return payload ? { ...action, payload, meta } : { ...action, meta }
-      }
-    })
+    actionCreators.push(
+      nameFunction('asd', (payload?: any) => {
+        const action = { type: actionType }
+        if (!meta) {
+          return payload ? { ...action, payload } : action
+        } else {
+          return payload ? { ...action, payload, meta } : { ...action, meta }
+        }
+      })
+    )
   }
 
   Object.entries(mutations).forEach(([key, value]) => {

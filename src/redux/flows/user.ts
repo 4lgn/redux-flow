@@ -1,4 +1,4 @@
-import Flow from '../Flow'
+import Flow, { asyncState, AsyncObj } from '../Flow'
 
 /*
 
@@ -22,35 +22,63 @@ selectors?
 
 */
 
-const asyncState = {
-  isFetching: false,
-  data: null,
-  error: '',
+// TODO: Suggestion: maybe make it key'ed object like Vuex
+
+interface UserInfo {
+  id: number
 }
 
-// TODO: Suggestion: maybe make it key'ed object like Vuex
+type State = {
+  id: number
+  info: AsyncObj<UserInfo | null>
+}
 
 export const { reducer, actions } = Flow('user', {
   initialState: {
     id: 0,
     info: asyncState,
-  },
+  } as State,
   mutations: {
-    setId(state: any, payload: any) {
+    setId(state: State, payload: number) {
       return { ...state, id: payload }
     },
-    // incrementId(state: any) {
-    //   return { ...state, id: state.id + 1 }
-    // },
   },
   actions: {
-    async info(state: any) {
-      const res = await fetch(`https://reqres.in/api/users/${state.id}`)
-      // const res = await fetch(
-      //   `http://slowwly.robertomurray.co.uk/delay/3000/url/https://reqres.in/api/users/${state.id}`
-      // )
-      if (res.status !== 200) throw Error('Error ' + res.status)
-      return await res.json()
+    fetchUserInfo: {
+      selector: (state: State) => state.info,
+      fn: async (state: State) => {
+        const res = await fetch(`https://reqres.in/api/users/${state.id}`)
+        // const res = await fetch(
+        //   `http://slowwly.robertomurray.co.uk/delay/3000/url/https://reqres.in/api/users/${state.id}`
+        // )
+        if (res.status !== 200) throw Error('Error ' + res.status)
+        return await res.json()
+      },
     },
   },
 })
+
+// export const { reducer, actions } = Flow('user', {
+//   options: {
+//     id: {
+//       initialState: 0,
+//       mutations: {
+//         setUserId (current: any, payload: any) {
+//           return payload
+//         }
+//       }
+//     },
+//     info: {
+//       initialState: asyncState,
+//       actions: {
+//         async info(state: any) {
+//           const res = await fetch(`https://reqres.in/api/users/${state.id}`)
+//           // const res = await fetch(
+//           //   `http://slowwly.robertomurray.co.uk/delay/3000/url/https://reqres.in/api/users/${state.id}`
+//           // )
+//           if (res.status !== 200) throw Error('Error ' + res.status)
+//           return await res.json()
+//         }
+//       }
+//   }
+// })
