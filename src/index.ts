@@ -18,13 +18,13 @@ export const asyncState: AsyncObj<any> = {
   error: '',
 }
 
-type Action<State> = {
+export type Action<State> = {
   type: string
-  payload: any
+  payload?: any
   meta?: (state: State, payload?: any) => Promise<any>
 }
 
-type ActionCreator = <T>(payload?: T) => Action<T>
+export type ActionCreator = <T>(payload?: T) => Action<T>
 
 export const flowMiddleware = (store: any) => (next: any) => (
   action: Action<any>
