@@ -66,6 +66,7 @@ describe('reducer', () => {
   })
 
   it('returns correct action creators', () => {
+    console.log(actions)
     expect(setId(5)).toEqual({
       type: 'user/setId',
       payload: 5,

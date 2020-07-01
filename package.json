@@ -2,18 +2,35 @@
   "name": "redux-flow-beta",
   "version": "0.8.0",
   "private": true,
-  "main": "src/index.ts",
-  "types": "src/index.d.ts",
+  "description": "Simplified and streamlined synchronous and asynchronous state management in Redux",
+  "main": "lib/src/index.ts",
+  "types": "lib/src/index.d.ts",
   "author": "Alexander G. Nielsen",
   "license": "MIT",
+  "keywords": [
+    "redux",
+    "redux-async",
+    "redux-flow"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/4lgn/redux-flow"
+  },
+  "bugs": {
+    "url": "https://github.com/4lgn/redux-flow/issues"
+  },
   "devDependencies": {
+    "@types/jest": "^26.0.3",
     "react-scripts": "3.4.1",
-    "typescript": "^3.8.3",
-    "@types/jest": "^25.2.1"
+    "typescript": "^3.8.3"
   },
   "scripts": {
     "start": "react-scripts start",
     "test": "react-scripts test",
     "build": "react-scripts build"
+  },
+  "dependencies": {
+    "jest": "^26.1.0",
+    "ts-jest": "^26.1.1"
   }
 }

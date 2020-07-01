@@ -1,3 +1,6 @@
 README.md
-jest.config.json
-test/
+tsconfig.json
+jestconfig.json
+src
+.prettierrc
+src/__tests__/*
