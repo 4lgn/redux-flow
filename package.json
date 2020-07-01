@@ -1,6 +1,6 @@
 {
   "name": "redux-flow-beta",
-  "version": "0.8.2",
+  "version": "0.8.3",
   "description": "Simplified and streamlined synchronous and asynchronous state management in Redux",
   "main": "lib/src/index.ts",
   "types": "lib/src/index.d.ts",

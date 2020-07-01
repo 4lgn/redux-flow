@@ -1,6 +1,7 @@
 README.md
 tsconfig.json
 jestconfig.json
-src
+.editorconfig
 .prettierrc
-src/__tests__/*
+src
+lib/__tests__
