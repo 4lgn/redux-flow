@@ -1,7 +1,6 @@
 {
   "name": "redux-flow-beta",
-  "version": "0.8.0",
-  "private": true,
+  "version": "0.8.2",
   "description": "Simplified and streamlined synchronous and asynchronous state management in Redux",
   "main": "lib/src/index.ts",
   "types": "lib/src/index.d.ts",
@@ -22,15 +21,13 @@
   "devDependencies": {
     "@types/jest": "^26.0.3",
     "react-scripts": "3.4.1",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "jest": "^26.1.0",
+    "ts-jest": "^26.1.1"
   },
   "scripts": {
     "start": "react-scripts start",
     "test": "react-scripts test",
     "build": "react-scripts build"
-  },
-  "dependencies": {
-    "jest": "^26.1.0",
-    "ts-jest": "^26.1.1"
   }
 }
