@@ -1,0 +1,1 @@
+"You want to do X on Y that might be a part of Z, and get A in return if X succeeded, and otherwise B."
