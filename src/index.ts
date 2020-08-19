@@ -1,4 +1,7 @@
-import nameFunction from './nameFunction'
+function nameFunction(name: string, body: any) {
+  Object.defineProperty(body, 'name', { value: name, writable: false })
+  return body
+}
 
 export interface AsyncObj<T> {
   isFetching: boolean
