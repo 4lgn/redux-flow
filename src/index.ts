@@ -1,10 +1,4 @@
-function nameFunction(name: string, body: any) {
-  return {
-    [name](...args: any[]) {
-      return body(...args)
-    },
-  }[name]
-}
+import nameFunction from './nameFunction'
 
 export interface AsyncObj<T> {
   isFetching: boolean
