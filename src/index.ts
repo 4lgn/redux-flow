@@ -1,3 +1,45 @@
+class NoStoreSetError extends Error {
+  constructor(funName: string) {
+    super(
+      'Tried to call ' +
+        funName +
+        ' without having a store set.\nUse setStore to bind your store to Flow.'
+    )
+  }
+}
+
+export interface Dispatch<A extends Action<any> = any> {
+  <T extends A>(action: T): T
+}
+
+export interface Store<S = any, A extends Action<any> = any> {
+  dispatch: Dispatch<A>
+
+  getState(): S
+}
+
+let _store: Store | null = null
+
+export function setStore(store: Store) {
+  _store = store
+}
+
+export function put(action: Action<any>) {
+  if (!_store) throw new NoStoreSetError('put')
+  _store.dispatch(action)
+}
+
+export function select<T>(selector: (state: any) => T): T {
+  if (!_store) throw new NoStoreSetError('select')
+  const rootState = _store.getState()
+  return selector(rootState)
+}
+
+export function getRootState() {
+  if (!_store) throw new NoStoreSetError('getRootState')
+  return _store.getState()
+}
+
 function nameFunction(name: string, body: any) {
   Object.defineProperty(body, 'name', { value: name, writable: false })
   return body
