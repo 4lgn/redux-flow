@@ -1,6 +1,6 @@
 {
   "name": "redux-flow",
-  "version": "1.0.7",
+  "version": "1.1.0",
   "description": "Simplified and streamlined synchronous and asynchronous state management in Redux",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -21,8 +21,8 @@
   "devDependencies": {
     "@types/jest": "^26.0.3",
     "react-scripts": "3.4.1",
-    "typescript": "^3.8.3",
-    "ts-jest": "^26.1.1"
+    "ts-jest": "^26.1.1",
+    "typescript": "^3.8.3"
   },
   "scripts": {
     "prepare": "tsc -t ES5 --outDir lib --declaration true src/index.ts",
