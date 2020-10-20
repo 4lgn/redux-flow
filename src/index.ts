@@ -1,3 +1,5 @@
+import { Store } from './types'
+
 class NoStoreSetError extends Error {
   constructor(funName: string) {
     super(
@@ -6,16 +8,6 @@ class NoStoreSetError extends Error {
         ' without having a store set.\nUse setStore to bind your store to Flow.'
     )
   }
-}
-
-export interface Dispatch<A extends Action<any> = any> {
-  <T extends A>(action: T): T
-}
-
-export interface Store<S = any, A extends Action<any> = any> {
-  dispatch: Dispatch<A>
-
-  getState(): S
 }
 
 let _store: Store | null = null
