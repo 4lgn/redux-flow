@@ -45,7 +45,7 @@ export interface AsyncObj<T> {
 
 export const asyncState: AsyncObj<any> = {
   isFetching: false,
-  data: null,
+  data: undefined,
   error: '',
 }
 
