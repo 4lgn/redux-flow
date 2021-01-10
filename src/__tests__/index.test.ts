@@ -92,7 +92,7 @@ describe('reducer', () => {
       id: 5,
       info: {
         isFetching: false,
-        data: null,
+        data: undefined,
         error: '',
       },
     })
@@ -103,7 +103,7 @@ describe('reducer', () => {
           id: 6,
           info: {
             isFetching: false,
-            data: null,
+            data: undefined,
             error: '',
           },
         },
@@ -116,7 +116,7 @@ describe('reducer', () => {
       id: 1337,
       info: {
         isFetching: false,
-        data: null,
+        data: undefined,
         error: '',
       },
     })
@@ -131,7 +131,7 @@ describe('reducer', () => {
       id: 0,
       info: {
         isFetching: true,
-        data: null,
+        data: undefined,
         error: '',
       },
     })

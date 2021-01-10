@@ -173,6 +173,7 @@ export default function <State>(
           ...state[selector],
           isFetching: false,
           error: payload,
+          data: null,
         },
       }
     }
