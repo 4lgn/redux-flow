@@ -8,8 +8,6 @@
 
 The mental model is a combination of the ["ducks" pattern](https://github.com/erikras/ducks-modular-redux) and the Unix philosophy of "Do One Thing and Do It Well". This library is probably not able to do _everything_ that Redux does (without excessive hacking), but in 90% of cases it does just enough. The last 10% will never be supported if it hinders usability and simplicity.
 
-"You want to do X on Y that might be a part of Z, and get A in return if X succeeded, and otherwise B."
-
 ## Installation
 
 ```sh
