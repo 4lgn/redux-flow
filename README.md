@@ -2,6 +2,7 @@
 
 [![npm version](https://img.shields.io/npm/v/redux-flow.svg)](https://www.npmjs.com/package/redux-flow)
 [![npm](https://img.shields.io/npm/dm/redux-flow.svg)](https://www.npmjs.com/package/redux-flow)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 
 `redux-flow` is an opinionated Redux library to manage your synchronous and asynchronous data flow, aiming to reduce the usual boilerplate as much as possible.
